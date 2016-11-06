@@ -58,7 +58,8 @@ def register(request):
 
 def register_handle(request):
     uname = request.POST.get('user_name')
-    if len(uname)>5 and len(uname)<20:
+    nametest = UserInfo.objects.filter(uname=uname)
+    if len(uname)>5 and len(uname)<20 and len(nametest)==0:
         pass
     else:
         return HttpResponse('please pick another name')
@@ -84,7 +85,7 @@ def register_handle(request):
     u.uemail = uemail
     u.save()
 #    users.cu.create_user(uname,upwd,uemail)
-    return HttpResponse('ok')
+    return redirect('/login/')
 
 
 
