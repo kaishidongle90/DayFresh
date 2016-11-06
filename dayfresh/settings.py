@@ -38,6 +38,7 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'fresh',
+    'haystack',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -110,3 +111,13 @@ STATICFILES_DIRS = [
 ]
 STATIC_ROOT='/var/www/dayfresh/static/'
 MEDIA_ROOT=os.path.join(BASE_DIR,"static")
+HAYSTACK_CONNECTIONS = {
+            'default': {
+                'ENGINE': 'haystack.backends.whoosh_cn_backend.WhooshEngine',
+                'PATH': os.path.join(BASE_DIR, 'whoosh_index'),
+                }
+ }
+
+
+
+HAYSTACK_SIGNAL_PROCESSOR = 'haystack.signals.RealtimeSignalProcessor'
