@@ -1,0 +1,67 @@
+from django.db import models
+from __future__ import unicode_literals
+from tinymce.models import HTMLField
+# Create your models here.
+
+#Table for user
+ class users(models.Model):
+    uname = models.CharField(max_length=20)
+    upwd = models.CharField(max_length=30)
+    uphoneNum = models.BigIntegerField(default=0,null=True,blank=True)
+    uaddress = models.CharField(max_length=50,null=True,blank=True)
+    uemail = models.EmailField()
+    upostcode = models.IntegerField(default=0,null=True,blank=True)
+
+#Table for goods
+class GoodsType(models.Model):
+    tTitle = models.CharField(max_length=20)
+
+    class Meta():
+        db_table = 'goodstype'
+    def __str__(self):
+        return self.tTitle.encode('utf-8')
+
+
+class GoodsInfo(models.Model):
+    gName = models.CharField(max_length=20)
+    gSubName = models.CharField(max_length=70)
+    gDesc = HTMLField()
+    gEval = HTMLField(null=True, blank=True)
+    gPrice = models.DecimalField(max_digits=5, decimal_places=2)
+    gUnit = models.CharField(max_length=20)
+    gPicl = models.ImageField(upload_to='images/goodsl/')
+    gPicb = models.ImageField(upload_to='images/goodsb/')
+    gPubdate = models.DateTimeField()
+    gSales = models.IntegerField(default=0)
+    gCounts = models.IntegerField(default=0)
+    gType = models.ForeignKey(GoodsType)
+
+    class Meta():
+        db_table = 'goodsinfo'
+
+    def __str__(self):
+        return self.gName.encode('utf-8')
+
+
+# Table for cart 
+class cartInfo(models.Model):
+    cuser = models.ForeignKey('userInfo')
+
+    cgoods = models.ForeignKey('goodsInfo')
+    cbuy_date = models.DateTimeField()
+    cnum = models.IntegerField(default=0)
+    # isDelete = models.BooleanField(default=False)
+
+    class Meta():
+        db_table = 'cartInfo'
+        ordering = ['id']
+
+    # def delete(self):
+    #     self.delete()
+
+    def add(self,user,goods,num):
+        cuser=user
+        cgoods = goods
+        cbuy_date = datetime.datetime()
+        cnum = num
+        self.save()

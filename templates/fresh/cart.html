@@ -1,0 +1,55 @@
+{%extends 'fresh/user_center_base.html'%}
+{% block title %}天天生鲜-购物车{% endblock title %}
+
+{% block script %}
+<script type="text/javascript" src="/static/fresh/js/jquery-1.12.4.min.js"></script>
+<script type="text/javascript" src="/static/fresh/js/jquery-ui.min.js"></script>
+<script type="text/javascript" src="/static/fresh/js/cartcount.js"></script>
+
+<script type="text/javascript" src='/static/fresh/js/jquery-1.12.4.min.js'></script>
+{% endblock script %}
+
+{% block main_con %}
+
+<div class="total_count">全部商品<em>2</em>件</div>	
+<ul class="cart_list_th clearfix">
+	<li class="col01">商品名称</li>
+	<li class="col02">商品单位</li>
+	<li class="col03">商品价格</li>
+	<li class="col04">数量</li>
+	<li class="col05">小计</li>
+	<li class="col06">操作</li>
+</ul>
+
+<form method="post" action="/place_order/">
+{%for cart1 in cart%}	
+<ul class="cart_list_td clearfix">
+	<li class="col01"><input type="checkbox" name="cart_id" value="{{cart1.id}}" checked="checked"></li>
+	<li class="col02"><img src="/static/{{cart1.cgoods.gpic}}"></li>
+	<li class="col03">{{cart1.cgoods.gname}}<br><em>{{cart1.cgoods.gprice}}元/500g</em></li>
+	<li class="col04">{{cart1.cgoods.gunit}}</li>
+	<li class="col05">{{cart1.cgoods.gprice}}元</li>
+	<li class="col06">
+		<div class="num_add">
+			<a href="javascript:;" class="add fl">+</a>
+			<input type="text" class="num_show fl" name="count" value="{{cart1.cnum}}">	
+			<a href="javascript:;" class="minus fl">-</a>	
+		</div>
+	</li>
+	<li class="col07" id="total"><em>{{cart1.cgoods.gprice}}</em>元</li>
+	<li class="col08"><a href="/del_cart{{cart1.id}}">删除</a></li>
+</ul>
+{%endfor%}
+
+
+<ul class="settlements">
+	<li class="col01"><input type="checkbox" id="all" checked="checked"></li>
+	<li class="col02">全选</li>
+	<li class="col03">合计(不含运费)：<span>¥</span><em>2.0</em><br>共计<b>2</b>件商品</li>
+	<li class="col04"><input type="submit" value="去结算"></li>
+</ul>
+</form>
+	
+{% endblock %}
+
+
