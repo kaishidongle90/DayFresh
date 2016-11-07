@@ -27,6 +27,9 @@ class OrderDetialInfoAdmin(admin.ModelAdmin):
     list_display = ['id','dorder','dgoods','dnum','dtotal']
 
 
+class JustSawAdmin(admin.ModelAdmin):
+	list_display = ['id','jgoodsid']
+
 
 admin.site.register(OrderDetialInfo, OrderDetialInfoAdmin)
 admin.site.register(GoodsType,GoodsTypeAdmin)
@@ -34,3 +37,4 @@ admin.site.register(GoodsInfo,GoodsInfoAdmin)
 admin.site.register(UserInfo,UserInfoAdmin)
 admin.site.register(OrderInfo, OrderInfoAdmin)
 admin.site.register(CartInfo, CartInfoAdmin)
+admin.site.register(JustSaw, JustSawAdmin)

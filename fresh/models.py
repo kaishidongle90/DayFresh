@@ -86,3 +86,10 @@ class OrderDetialInfo(models.Model):
     class Meta():
         db_table = 'orderDetialInfo'
         ordering = ['id']
+
+# zuijin liulan
+class  JustSaw(models.Model):
+    jgoodsid = models.CharField(max_length=20000)
+    class Meta():
+        db_table = 'justsaw'
+        ordering = ['id']

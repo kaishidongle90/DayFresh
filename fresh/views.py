@@ -43,8 +43,19 @@ def loginHandler(request):
 @transSession
 def user_center_info(request,dic):
     userinfo = UserInfo.objects.get(uname=dic['username'])
+
+    # -------------- zuijin liulan ----------
+    goodslist = JustSaw.objects.order_by('-id')[0:5]
+    sawlist = []
+    for i in goodslist:
+        id = int(i.jgoodsid)
+        sawlist.append(GoodsInfo.objects.get(pk=id))
+
+    # -------------- zuijin liulan ----------
+
     dic['phoneNum'] = userinfo.uphoneNum,
     dic['address'] = userinfo.uaddress
+    dic['sawlist'] = sawlist
     return render(request,'fresh/user_center_info.html',dic)
 @transSession
 def user_center_site(request,dic):
@@ -193,14 +204,13 @@ def list(request,dic,typeId,pageNum):
 
 @transSession
 def detail(request,dic,typeId,goodsId):
+    justsaw = JustSaw()
+    justsaw.jgoodsid = goodsId
+    justsaw.save()
+
     goodsType = GoodsType.objects.get(pk=typeId)
     goods = goodsType.goodsinfo_set.get(pk=goodsId)
     recommend = goodsType.goodsinfo_set.order_by('-id')[0:2]
-    # dic = {
-    #     'typeId':typeId,
-    #     'goods':goods,
-    #     'recommend':recommend,
-    # }
     dic['typeId'] = typeId
     dic['goods'] = goods
     dic['recommend'] = recommend
@@ -264,26 +274,37 @@ def user_center_order(request,dic):
     dic['orderlist']=orderlist
     return render(request,'fresh/user_center_order.html',dic)
 
-# @longin_test   
-# @transSession
-# def orderHandle(request,dic):
-#     user = UserInfo.objects.get(uname=dic['username'])
-#     totalPrice = 
-    
-#     order = OrderInfo()
-#     order.ouser = user
-#     order.odate = datetime.now()
-#     order.ototalprice = totalPrice
-#     order.ispay = True
-#     order.save()
 
-#     idlist = []
-#     numlist = []
-#     dtotal = []
-#     for i in range(len(goodslist):
-#         oDetail = OrderDetialInfo()
-#         oDetail.dorder = order
-#         oDetail.dgoods = GoodsInfo.objects.get(pk=idlist[i])
-#         oDetail.dnum = numlist[i]
-#         oDetail.dtotal = dtotal[i]
-#         oDetail.save()
+
+
+# this code for price  it's still has proplem but we cant fix it so just use
+def listByPrice(request,lIndex):
+    goodsPush = GoodsInfo.objects.order_by('-id')[0:3]
+    goods_type = GoodsType.objects.get(tTitle='新鲜水果')
+    list = goods_type.goodsinfo_set.order_by('gPrice')
+    sec = request.GET.get('sec')
+    if sec=='desc':
+        list = goods_type.goodsinfo_set.order_by('-gPrice')
+    pag = Paginator(list, 15)
+    pagelist = pag.page_range
+    if lIndex == '':
+        lIndex = '1'
+    list1 = pag.page(int(lIndex))
+    preIndex = int(lIndex)-1
+    if lIndex == '1':
+        preIndex = int(lIndex)
+    nextIndex = int(lIndex)+1
+    if int(lIndex) == pag.num_pages:
+        nextIndex = int(lIndex)
+    page = 'listByPrice'
+    dic = {
+            'goodsPush': goodsPush,
+            'list': list1,
+            'pagelist': pagelist,
+            'lIndex': int(lIndex),
+            'preIndex': preIndex,
+            'nextIndex': nextIndex,
+            'page': page,
+            'sec': sec,
+    }
+    return render(request, 'goods/list.html', dic)
