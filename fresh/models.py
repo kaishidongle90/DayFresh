@@ -30,7 +30,7 @@ class GoodsType(models.Model):
 
 
 class GoodsInfo(models.Model):
-    gname = models.CharField(max_length=20)
+    gname = models.CharField(max_length=20,verbose_name='名称')
     gsubname = models.CharField(max_length=70)
     gdesc = HTMLField()
     geval = HTMLField(null=True, blank=True)

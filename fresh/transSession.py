@@ -1,11 +1,11 @@
 from django.shortcuts import *
 def transSession(fn):
-    def func(request):
+    def func(request,*args):
         username = request.session.get('username','')
         dic = {
             "username":username,        
             }
-        return fn(request,dic)
+        return fn(request,dic,*args)
     return func
 
 

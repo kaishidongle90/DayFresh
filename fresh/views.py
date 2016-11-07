@@ -59,12 +59,18 @@ def register(request):
 def register_handle(request):
     uname = request.POST.get('user_name')
     nametest = UserInfo.objects.filter(uname=uname)
-    if len(uname)>5 and len(uname)<20 and len(nametest)==0:
+    #test esit
+    qing = UserInfo.objects.filter(uname=uname).exists()
+    if qing: 
+        return HttpResponse('+++++')
+    else:
+        return HttpResponse('-----')
+    if len(uname)>8 and len(uname)<20 and len(nametest)==0:
         pass
     else:
         return HttpResponse('please pick another name')
     upwd = request.POST.get('pwd')
-    if len(upwd)>=5 and len(upwd)<=20:
+    if len(upwd)>=8 and len(upwd)<=20:
         pass
     else:
          return HttpResponse('the passwd must more than 8 less 20')
@@ -127,8 +133,8 @@ def exit(request):
  	del request.session['username']
  	return redirect('/index/')
 
-
-def list(request,typeId,pageNum):
+@transSession
+def list(request,dic,typeId,pageNum):
     fruit = GoodsType.objects.get(pk=typeId)
     #按id顺序取出数据（正常排序）
     fruitlist = fruit.goodsinfo_set.all()
@@ -164,29 +170,40 @@ def list(request,typeId,pageNum):
         nextPageNum = p.num_pages
 
     list1 = p.page(pageNum)
-    dic = {
-    # id is the fruitType's id , put id to list.html for zhanweifu, nothing speical
-            'typeId':typeId,
-            'fruitlist':fruitlist,
-            'prange': prange,
-            'list1':list1,
-            'recommend':recommend,
-            'prePageNum':prePageNum,
-            'nextPageNum':nextPageNum,
-    }
+    # dic = {
+    # # id is the fruitType's id , put id to list.html for zhanweifu, nothing speical
+    #         'typeId':typeId,
+    #         'fruitlist':fruitlist,
+    #         'prange': prange,
+    #         'list1':list1,
+    #         'recommend':recommend,
+    #         'prePageNum':prePageNum,
+    #         'nextPageNum':nextPageNum,
+    # }
+    dic['typeId'] = typeId
+    dic['fruitlist'] = fruitlist
+    dic['prange'] = prange
+    dic['list1'] = list1
+    dic['recommend'] = recommend
+    dic['prePageNum'] = prePageNum
+    dic['nextPageNum'] = nextPageNum
     return render(request,'fresh/list.html',dic)
 
 
 
-def detail(request,typeId,goodsId):
+@transSession
+def detail(request,dic,typeId,goodsId):
     goodsType = GoodsType.objects.get(pk=typeId)
     goods = goodsType.goodsinfo_set.get(pk=goodsId)
     recommend = goodsType.goodsinfo_set.order_by('-id')[0:2]
-    dic = {
-        'typeId':typeId,
-        'goods':goods,
-        'recommend':recommend,
-    }
+    # dic = {
+    #     'typeId':typeId,
+    #     'goods':goods,
+    #     'recommend':recommend,
+    # }
+    dic['typeId'] = typeId
+    dic['goods'] = goods
+    dic['recommend'] = recommend
     return render(request,'fresh/detail.html',dic)
 
 @longin_test

@@ -39,6 +39,7 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'fresh',
     'haystack',
+    'tinymce',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -121,3 +122,11 @@ HAYSTACK_CONNECTIONS = {
 
 
 HAYSTACK_SIGNAL_PROCESSOR = 'haystack.signals.RealtimeSignalProcessor'
+
+
+
+TINYMCE_DEFAULT_CONFIG = {
+    'theme': 'advanced',
+    'width': 600,
+    'height': 400,
+}
