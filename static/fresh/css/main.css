@@ -23,11 +23,11 @@ html,body{height:100%}
 
 .login_info em{color:#ff8800}
 
-.login_btn a,.user_link a{
+.login_btn a,.user_link a,.login_info a{
 	color:#666;
 }
 
-.login_btn a:hover,.user_link a:hover{
+.login_btn a:hover,.user_link a:hover,.login_info a:hover{
 	color:#ff8800;
 }
 
@@ -281,7 +281,7 @@ html,body{height:100%}
 .login_form_bg{height:480px;background-color:#518e17}
 .no-mp{margin-top:0px;}
 .login_form_wrap{width:960px;height:480px;margin:0 auto;}
-.login_banner{width:381px;height:322px;background:url(../images/login_banner.png) no-repeat;margin-top:90px;}
+.login_banner{width:381px;height:322px;background:url(../images/website/login_banner.png) no-repeat;margin-top:90px;}
 .slogan{width:40px;height:300px;font-size:30px;color:#f0f9e8;text-align:center;line-height:36px;margin:80px 0 0 120px}
 .login_form{width:368px;height:378px;border:1px solid #c6c6c5;background-color:#fff; margin-top:50px;}
 

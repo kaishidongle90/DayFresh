@@ -22,7 +22,7 @@ class UserInfo(models.Model):
 #Table for goods
 class GoodsType(models.Model):
     ttitle = models.CharField(max_length=20)
-
+    tpic =  models.ImageField(upload_to='fresh/images/goods/')
     class Meta():
         db_table = 'goodstype'
     def __str__(self):

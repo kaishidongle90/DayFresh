@@ -40,14 +40,16 @@
 		
 		{% for cart in cartlist %}
 		
-		<ul class="goods_list_td clearfix">
-			<li class="col01">{{forloop.counter}}</li>			
+		<ul class="goods_list_td clearfix" goodsid="{{cart.cgoods.id}}">
+			<li class="col01"  cartid="{{cart.id}}">{{forloop.counter}}</li>			
 			<li class="col02"><img src="/static/{{cart.cgoods.gpic}}"></li>
 			<li class="col03">{{cart.cgoods.gname}}</li>
 			<li class="col04">{{cart.cgoods.gunit}}</li>
 			<li class="col05">{{cart.cgoods.gprice}}元</li>
 			<li class="col06">{{cart.cnum}}</li>
-			<li class="col07">{% widthratio cart.cgoods.gprice 1 cart.cnum %}元</li>	
+			<li class="col07"><em></em>元</li>	
+			
+			
 		</ul>
 		{% endfor %}
 		
@@ -57,14 +59,14 @@
 
 	<div class="common_list_con clearfix">
 		<div class="settle_con">
-			<div class="total_goods_count">共<em>2</em>件商品，总金额<b>42.60元</b></div>
+			<div class="total_goods_count">共<em></em>件商品，总金额<b><span></span>元</b></div>
 			<div class="transit">运费：<b>10元</b></div>
-			<div class="total_pay">实付款：<b>52.60元</b></div>
+			<div class="total_pay">实付款：<b><span></span>元</b></div>
 		</div>
 	</div>
 
 	<div class="order_submit clearfix">
-		<a href="#" id="order_btn">提交订单</a>
+		<a href="javascript:;" id="order_btn">提交订单</a>
 	</div>	
 {%endblock%}
 
@@ -75,22 +77,75 @@
 			<p>订单提交成功！</p>
 		</div>
 		
-		<div class="mask"></div>
-	</div>
-	<script type="text/javascript" src="/static/fresh/js/jquery-1.12.4.min.js"></script>
-	<script type="text/javascript">
+		<div class="mask"></div>	
+</div>
+
+<script type="text/javascript" src="/static/fresh/js/jquery-1.12.4.min.js"></script>
+<script type="text/javascript">
+	$(function(){
 		$('#order_btn').click(function() {
-			localStorage.setItem('order_finish',2);
 
-			$('.popup_con').fadeIn('fast', function() {
+			var total=0;
+			var num=0;
+			var numlist=[];
+			var idlist=[];
+			var cartidlist=[];
+			var totallist=[];
+			$(".goods_list_td").each(function(){
+				var v=$(this).find(".col05").html();
+				var n=$(this).find(".col06").html();
+				var t=parseFloat(v)*parseInt(n);
+				total+=parseFloat(t);
+				num+=parseInt(n);
 
-				setTimeout(function(){
-					$('.popup_con').fadeOut('fast',function(){
-						window.location.href = '/user_center_order/';
-					});	
-				},3000)
-				
+				numlist.push(n);
+				idlist.push($(this).attr('goodsid'));
+				cartidlist.push($(this).find(".col01").attr('cartid'))
+				totallist.push(t.toFixed(2));
+
 			});
+
+
+			$.post("/orderHandle/",
+			       {"ids[]":idlist,"nums[]":numlist,"totals[]":totallist,"total[]":total.toFixed(2),"cartidlist[]":cartidlist}
+			       ,function(data){
+								localStorage.setItem('order_finish',2);
+
+								$('.popup_con').fadeIn('fast', function() {
+
+									setTimeout(function(){
+										$('.popup_con').fadeOut('fast',function(){
+										window.location.href = '/user_center_order/';
+									});	
+								},3000)
+				
+							});
+			       }); 
+
+
+			
 		});
-	</script>
+
+		// 计算小计
+		var total=0;
+		var num=0;
+		$(".goods_list_td").each(function(){
+			var v=$(this).find(".col05").html();
+			var n=$(this).find(".col06").html();
+			var t=parseFloat(v)*parseInt(n);
+			$(this).find(".col07>em").html(t.toFixed(2));
+			total+=parseFloat(t);
+			num+=parseInt(n);
+
+		});
+
+		$(".total_goods_count>em").html(num);
+		$(".total_goods_count>b>span").html(total.toFixed(2));
+		$(".total_pay>b>span").html((total+10).toFixed(2));
+		 
+	});
+
+
+
+</script>
 {% endblock %}

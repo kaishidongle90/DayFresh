@@ -11,35 +11,36 @@ from transSession import transSession,longin_test
 
 @transSession
 def index(request,dic):
-    fruitType = GoodsType.objects.get(pk=4)
-    seafoodType = GoodsType.objects.get(pk=5)
-    fruitlist = fruitType.goodsinfo_set.all()[0:4]
-    seafoodlist = seafoodType.goodsinfo_set.all()[0:4]
-    print seafoodlist,seafoodType
-    dic['fruitlist'] = fruitlist
-    dic['fruitTypeId'] = 4
-    dic['seafoodlist'] = seafoodlist
-    dic['seafoodTypeId'] = 5
+# 将数据类型传到html页面中，在html里处理
+    goodstypelist = GoodsType.objects.all()
+    dic['goodstypelist'] = goodstypelist
     return render(request,'fresh/index.html',dic)
-
 
 def login(request):
     return render(request,'fresh/login.html')
 
-
+#登陆页面的判断，验证用户的密码是否正确
 def loginHandler(request):
     uname = request.POST['username']
     upwd = request.POST['pwd']
+    #判断密码是否为空 ，不能使用get方法， 因为get方法得到的是一个对象，没有True和False之分
+    # filter 得到的是一个列表，可以判断长度
     pwdtest = UserInfo.objects.filter(upwd=upwd)
     if len(pwdtest) == 0:
         return HttpResponse('passwd cannot be null')
+    #判断用户名是否存在
     nametest = UserInfo.objects.filter(uname=uname)
     if len(nametest)>0 and len(pwdtest)>0:
     	request.session["username"] = uname
         return redirect('/index/')
     else:
+ 
         return HttpResponse('user or pwd is error ')
+
+
+#@longin_test  判断用户是否存在，如果不存在，则跳到login页面，用在用户必须登陆的地方，像用户中心
 @longin_test
+#使用/login/写入的session ，可以在多个页面中使用
 @transSession
 def user_center_info(request,dic):
     userinfo = UserInfo.objects.get(uname=dic['username'])
@@ -59,6 +60,7 @@ def user_center_info(request,dic):
     return render(request,'fresh/user_center_info.html',dic)
 @transSession
 def user_center_site(request,dic):
+    # dic['username'] 从seesion中取值
     userinfo = UserInfo.objects.get(uname=dic['username'])
     dic['phoneNum'] = userinfo.uphoneNum,
     dic['address'] = userinfo.uaddress,
@@ -67,15 +69,11 @@ def user_center_site(request,dic):
 def register(request):
     return render(request,'fresh/register.html')
 
+#对注册页的数据进行判断处理
 def register_handle(request):
     uname = request.POST.get('user_name')
+    # 如果用户名存在不能为空
     nametest = UserInfo.objects.filter(uname=uname)
-    #test esit
-    qing = UserInfo.objects.filter(uname=uname).exists()
-    if qing: 
-        return HttpResponse('+++++')
-    else:
-        return HttpResponse('-----')
     if len(uname)>8 and len(uname)<20 and len(nametest)==0:
         pass
     else:
@@ -89,7 +87,7 @@ def register_handle(request):
     if upwd != ucpwd:
         return HttpResponse('the passwd is different')
     uemail = request.POST.get('email')
- 
+    # 判断邮箱是否合法
     isMatch = bool(re.match('[a-zA-Z0-9][\w]{0,19}@[a-zA-Z0-9]{2,6}\.(com|cn)$', uemail,re.VERBOSE));  
     if not isMatch:  
         return HttpResponse('please write the right email') 
@@ -125,12 +123,11 @@ def place_order(request,dic):
 
     return render(request,'fresh/place_order.html',dic)
 
-
+#修改用户的地址 电话 邮编等
 def reciver_handle(request):
     reciver = request.POST.get('reciver')
     address = request.POST.get('address')
     postcode = request.POST.get('postcode')
-    print reciver
     phoneNum = request.POST.get('phoneNum')
     u = UserInfo.objects.get(uname=reciver)
     u.uaddress = address
@@ -146,26 +143,22 @@ def exit(request):
 
 @transSession
 def list(request,dic,typeId,pageNum):
-    fruit = GoodsType.objects.get(pk=typeId)
+    goods = GoodsType.objects.get(pk=typeId)
+    goodstype = GoodsType.objects.get(pk=typeId)
     #按id顺序取出数据（正常排序）
-    fruitlist = fruit.goodsinfo_set.all()
-    #按价格倒序取出数据
-    ivertedfruitlist = fruit.goodsinfo_set.order_by('-gprice')
-    #按价格正序取出数据
-    positivefruitlist = fruit.goodsinfo_set.order_by('-gprice')
-    #推荐商品取值
-    recommend = fruit.goodsinfo_set.order_by('-id')[0:2]
-    #分页
-    # if priceId =='' or priceId == 1:
-    #     fruitlist = normalfruitlist
-    # else:
-    #     fruitlist = ivertedfruitlist
 
-    p = Paginator(fruitlist,4)
+    goodslist = goods.goodsinfo_set.order_by('id')
+    sec = request.GET.get('sec')
+    if sec=='desc':
+        goodslist = goods.goodsinfo_set.order_by('-gprice')
+        sec = 'desc'
+    else:
+        sec = 'asc'
+
+    recommend = goods.goodsinfo_set.order_by('-id')[0:2]
+    p = Paginator(goodslist,4)
     if pageNum == '' :
         pageNum = 1
-
-   
     prange = p.page_range
     #上一页功能实现
     if int(pageNum) > 1:
@@ -181,26 +174,65 @@ def list(request,dic,typeId,pageNum):
         nextPageNum = p.num_pages
 
     list1 = p.page(pageNum)
-    # dic = {
-    # # id is the fruitType's id , put id to list.html for zhanweifu, nothing speical
-    #         'typeId':typeId,
-    #         'fruitlist':fruitlist,
-    #         'prange': prange,
-    #         'list1':list1,
-    #         'recommend':recommend,
-    #         'prePageNum':prePageNum,
-    #         'nextPageNum':nextPageNum,
-    # }
+    page = 'list'
+    dic['goodstype'] = goodstype
     dic['typeId'] = typeId
-    dic['fruitlist'] = fruitlist
+    dic['goodslist'] = goodslist
     dic['prange'] = prange
     dic['list1'] = list1
     dic['recommend'] = recommend
     dic['prePageNum'] = prePageNum
     dic['nextPageNum'] = nextPageNum
+    dic['sec'] = sec
+    dic['page'] = page
+    dic['pageNum'] = int(pageNum)
     return render(request,'fresh/list.html',dic)
 
+@transSession
+def listByPrice(request,dic,typeId,pageNum):
+    goods = GoodsType.objects.get(pk=typeId)
+    #按id顺序取出数据（正常排序）
 
+    goodslist = goods.goodsinfo_set.order_by('gprice')
+    sec = request.GET.get('sec')
+    if sec=='desc':
+        goodslist = goods.goodsinfo_set.order_by('-gprice')
+        sec = 'desc'
+    else:
+        sec = 'asc'
+
+    recommend = goods.goodsinfo_set.order_by('-id')[0:2]
+    p = Paginator(goodslist,4)
+    if pageNum == '' :
+        pageNum = 1
+    prange = p.page_range
+    #上一页功能实现
+    if int(pageNum) > 1:
+        prePageNum = int(pageNum) -1
+    else:
+        prePageNum = 1
+
+    #下一页功能实现
+    if int(pageNum) < p.num_pages:
+        print type(pageNum)
+        nextPageNum = int(pageNum) + 1
+    else:
+        nextPageNum = p.num_pages
+
+    list1 = p.page(pageNum)
+    page = 'listByPrice'
+
+    dic['typeId'] = typeId
+    dic['goodslist'] = goodslist
+    dic['prange'] = prange
+    dic['list1'] = list1
+    dic['recommend'] = recommend
+    dic['prePageNum'] = prePageNum
+    dic['nextPageNum'] = nextPageNum
+    dic['sec'] = sec
+    dic['page'] = page
+    dic['pageNum'] = int(pageNum)
+    return render(request, 'fresh/list.html', dic)
 
 @transSession
 def detail(request,dic,typeId,goodsId):
@@ -225,21 +257,22 @@ def cart(request,dic):
     # print num
     dic['cart'] = cartlist
     return render(request, 'fresh/cart.html', dic)
-@longin_test   
+@longin_test
 @transSession
-def add_cart(request,dic):
+def add_cart(request, dic):
     id1 = request.GET['gid']
     num = request.GET['gnum']
-    print id1,num
-    user = UserInfo.objects.get(uname = dic['username'])
+    print id1, num
+    user = UserInfo.objects.get(uname=dic['username'])
     goods = GoodsInfo.objects.get(pk=id1)
+    print goods
 
     if CartInfo.objects.filter(cgoods=goods):
         cart = CartInfo.objects.get(cgoods=goods)
         cart.cnum += int(num)
         cart.save()
     else:
-        cart = CartInfo()         
+        cart = CartInfo()
         cart.cuser = user
         cart.cgoods = goods
         cart.cbuy_date = datetime.now()
@@ -256,10 +289,8 @@ def set_num(request):
     dic1 = request.POST
     numlist = dic1.getlist('num')
     idlist = dic1.getlist('id')
-    for id in idlist:
-        id=int(id)
-    for num in numlist:
-        num = int(num) 
+    id = idlist[0]
+    num = numlist[0]
 
     cart = CartInfo.objects.get(pk=id)
     cart.cnum = num
@@ -270,41 +301,66 @@ def set_num(request):
 @transSession
 def user_center_order(request,dic):
     user = UserInfo.objects.get(uname=dic['username'])
-    orderlist = user.orderinfo_set.all()
+    orderlist = user.orderinfo_set.order_by('-id')
     dic['orderlist']=orderlist
     return render(request,'fresh/user_center_order.html',dic)
 
 
 
+@longin_test
+@transSession
+def orderHandle(request,dic):
+    data=request.POST
+    numlist=data.getlist('nums[]')
+    idlist=data.getlist('ids[]')
+    totallist=data.getlist('totals[]')
+    total=data.getlist('total[]')
+    cartlist=data.getlist('cartidlist[]')
+    print numlist,idlist,totallist,total,cartlist
 
-# this code for price  it's still has proplem but we cant fix it so just use
-def listByPrice(request,lIndex):
-    goodsPush = GoodsInfo.objects.order_by('-id')[0:3]
-    goods_type = GoodsType.objects.get(tTitle='新鲜水果')
-    list = goods_type.goodsinfo_set.order_by('gPrice')
-    sec = request.GET.get('sec')
-    if sec=='desc':
-        list = goods_type.goodsinfo_set.order_by('-gPrice')
-    pag = Paginator(list, 15)
-    pagelist = pag.page_range
-    if lIndex == '':
-        lIndex = '1'
-    list1 = pag.page(int(lIndex))
-    preIndex = int(lIndex)-1
-    if lIndex == '1':
-        preIndex = int(lIndex)
-    nextIndex = int(lIndex)+1
-    if int(lIndex) == pag.num_pages:
-        nextIndex = int(lIndex)
-    page = 'listByPrice'
-    dic = {
-            'goodsPush': goodsPush,
-            'list': list1,
-            'pagelist': pagelist,
-            'lIndex': int(lIndex),
-            'preIndex': preIndex,
-            'nextIndex': nextIndex,
-            'page': page,
-            'sec': sec,
-    }
-    return render(request, 'goods/list.html', dic)
+    user = UserInfo.objects.get(uname=dic['username'])
+    order = OrderInfo()
+    order.ouser = user
+    order.odate = datetime.now()
+    order.ototalprice = total[0]
+    order.ispay = True
+    order.save()
+
+    for i in range(len(idlist)):
+        oDetail = OrderDetialInfo()
+        oDetail.dorder = order
+        oDetail.dgoods = GoodsInfo.objects.get(pk=idlist[i])
+        oDetail.dnum = numlist[i]
+        oDetail.dtotal = totallist[i]
+        oDetail.save()
+        cart=CartInfo.objects.get(pk=int(cartlist[i]))
+        cart.delete()
+
+
+
+    return redirect('/user_center_order/')
+
+
+
+@longin_test
+@transSession
+def place_order1(request, dic):
+    id1 = request.GET['gid']
+    num = request.GET['gnum']
+    print id1,num
+    user = UserInfo.objects.get(uname=dic['username'])
+    goods = GoodsInfo.objects.get(pk=id1)
+    dic['user'] = user
+    dic['goods'] = goods
+    dic['num'] = num
+    print dic
+
+    return render(request, 'fresh/place_order1.html', dic)
+
+
+# 根据register.js提交过来的数据 ，判断用户名是否存在 在register.html中
+def check_name(request):
+    # POST AND GET  方法都是可以的
+    user=request.POST['username']
+    if UserInfo.objects.get(uname=user):
+        return HttpResponse('ok')

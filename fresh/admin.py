@@ -4,7 +4,7 @@ from models import *
 
 
 class GoodsTypeAdmin(admin.ModelAdmin):
-	list_display = ['id','ttitle']
+	list_display = ['id','ttitle','tpic']
 
 class GoodsInfoAdmin(admin.ModelAdmin):
 	list_display = ['id','gname','gprice','gpic','gdesc']

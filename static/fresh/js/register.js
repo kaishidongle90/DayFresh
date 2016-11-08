@@ -39,6 +39,7 @@ $(function(){
 
 
 	function check_user_name(){
+		var username=$('#user_name').val()
 		var len = $('#user_name').val().length;
 		if(len<5||len>20)
 		{
@@ -48,8 +49,21 @@ $(function(){
 		}
 		else
 		{
-			$('#user_name').next().hide();
-			error_name = false;
+			$.post("/check_name/",{username:username},
+			      function (data){
+			      	if(data='ok')
+			      	{	
+			      		$('#user_name').next().html('用户名已存在');
+			      		$('#user_name').next().show();
+			      	}
+			      	else
+			      	{
+			      		$('#user_name').next().hide();
+								error_name = false;
+			      	}
+
+
+			      });
 		}
 	}
 
@@ -63,6 +77,7 @@ $(function(){
 		}
 		else
 		{
+
 			$('#pwd').next().hide();
 			error_password = false;
 		}		

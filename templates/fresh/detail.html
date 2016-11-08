@@ -6,12 +6,12 @@
 {% endblock script %}
 {% block main_con %}
 <div class="goods_detail_con clearfix">
-		<div class="goods_detail_pic fl"><img src="/static/{{goods.gpic}}"></div>
+		<div class="goods_detail_pic fl"><img style="display:block;width:100%;" src="/static/{{goods.gpic}}"></div>
 
 		<div class="goods_detail_list fr">
-			<h3>{{goods.name}}</h3>
+			<h3>{{goods.gname}}</h3>
 			<label id="gd_id" hidden="hidden">{{goods.id}}</label>
-			<p>{{goods.gsub}}</p>
+			<p>{{goods.gsubname}}</p>
 			<div class="prize_bar">
 				<span class="show_pirze">¥<em>{{goods.gprice}}</em></span>
 				<span class="show_unit">单  位：{{goods.gunit}}</span>
@@ -26,8 +26,8 @@
 			</div>
 			<div class="total">总价：<em></em><label>元</label></div>
 			<div class="operate_btn">
-				<a href="/place_order/" class="buy_btn">立即购买</a>
-				<a href="/cart/" class="add_cart" id="add_cart">加入购物车</a>				
+				<a href="javascript:;" class="buy_btn">立即购买</a>
+				<a href="javascript:;" class="add_cart" id="add_cart">加入购物车</a>				
 			</div>
 		</div>
 	</div>
@@ -50,17 +50,14 @@
 
 		<div class="r_wrap fr clearfix">
 			<ul class="detail_tab clearfix">
-				<li class="active">商品介绍</li>
-				<li>评论</li>
+				<li class="active" id="goods_intro">商品介绍</li>
+				<li id="goods_eval">评论</li>
 			</ul>
 
 			<div class="tab_content">
-				<dl>
-					<dt>商品详情：</dt>
-					<dd>{{goods.gdesc|safe}} </dd>
-				</dl>
+				<dl id="intro_content">{{goods.gdesc|safe}}</dl>
+				<dl id="eval_content" style="display:none;">{{goods.geval|safe}}</dl>
 			</div>
-
 		</div>
 	</div>
 {% endblock%}
@@ -68,7 +65,7 @@
 {% block foot_style %}
 <div class="add_jump"></div>
 
-	<script type="text/javascript" src="js/jquery-1.12.2.js"></script>
+	<script type="text/javascript" src="/static/fresh/js/jquery-1.12.4.min.js"></script>
 	<script type="text/javascript">
 		var $add_x = $('#add_cart').offset().top;
 		var $add_y = $('#add_cart').offset().left;
